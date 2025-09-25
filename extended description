@@ -1,0 +1,74 @@
+## Objective
+The objective of this lab is to illustrate **Inter-VLAN Routing** with one physical router interface.
+This is done by creating **logical sub-interfaces** (one for each VLAN) and adding IP addresses for each VLAN's default gateway.
+---
+
+## Network Setup
+
+### Devices
+- **Router:** Cisco 2911
+- **Switch:** Cisco 2960-24TT
+- **End Devices:** 4 PCs
+
+### VLAN Assignment
+
+- **VLAN 10 (192.168.10.0/24):** PC0, PC1
+- **VLAN 20 (192.168.20.0/24):** PC2, PC3
+
+---
+
+## Configuration Steps
+
+### 1. Switch Configuration
+Switch> enable
+Switch# configure terminal
+Switch(config)# vlan 10
+Switch(config-vlan)# name Sales
+Switch(config-vlan)# exit
+Switch(config)# vlan 20
+Switch(config-vlan)# name HR
+Switch(config-vlan)# exit
+Switch(config)# interface fa0/1
+Switch(config-if)# switchport mode access
+Switch(config-if)# switchport access vlan 10
+Switch(config)# interface fa0/2
+Switch(config-if)# switchport mode access
+Switch(config-if)# switchport access vlan 10
+Switch(config)# interface fa0/4
+Switch(config-if)# switchport mode access
+Switch(config-if)# switchport access vlan 20
+Switch(config)# interface fa0/5
+Switch(config-if)# switchport mode access
+Switch(config-if)# switchport access vlan 20
+Switch(config)# interface fa0/0
+Switch(config-if)# switchport mode trunk
+
+2. Router Configuration
+Router> enable
+Router# configure terminal
+Router(config)# interface g0/0
+Router(config-if)# no shutdown
+Router(config)# interface g0/0.10
+Router(config-subif)# encapsulation dot1Q 10
+Router(config-subif)# ip address 192.168.10.1 255.255.255.0
+Router(config)# interface g0/0.20
+Router(config-subif)# encapsulation dot1Q 20
+Router(config-subif)# ip address 192.168.20.1 255.255.255.0
+
+3. PC Configuration
+PC0 (VLAN 10): IP 192.168.10.2 / Gateway 192.168.10.1
+PC1 (VLAN 10): IP 192.168.10.3 / Gateway 192.168.10.1
+PC2 (VLAN 20): IP 192.168.20.2 / Gateway 192.168.20.1
+PC3 (VLAN 20): IP 192.168.20.3 / Gateway 192.168.20.1
+
+Testing
+
+Ping between PCs in the same VLAN → Should work.
+Ping between PCs in different VLANs → Should also work (via router sub-interfaces).
+
+Learning Outcomes
+
+How VLANs offer segmentation at Layer 2.
+How Router-on-a-Stick facilitates Layer 3 communication among VLANs.
+Practical implementation of VLANs, trunks, and router sub-interfaces.
+
